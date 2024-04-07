@@ -1,0 +1,513 @@
+<html>
+<head>
+  <title>Sudoku</title>
+  <style>
+    table#grid {
+      width: 330px;
+      height: 330px;
+      background-color: #a8f1c4;
+      border: 1px solid black;
+    }
+
+    table#grid tr td input {
+      width: 30px;
+      padding: 2px;
+      text-align: center;
+      font-weight: bold;
+      color: #000000;
+    }
+
+    table#grid tr td:nth-child(3), table#grid tr td:nth-child(6) {
+      border-right: 1px solid black;
+    }
+
+    table#grid tr:nth-child(3) td, table#grid tr:nth-child(6) td {
+      border-bottom: 1px solid black;
+    }
+
+    div#form_area {
+      width: 30%;
+      float: left;
+    }
+
+    div#sudoku_area {
+
+      width: 70%;
+      float: left;
+    }
+  </style>
+  <script>
+    function checkgrid () {
+      //Row by row checking
+      for (i = 1; i < 10; i++) {
+        var row = new Array()
+        for (j = 1; j < 10; j++) {
+          var id = 'inp_r' + i + '_c' + j
+          var cell = document.getElementById(id).value
+          if (cell < 10 && cell > 0) {
+            row.push(cell)
+          } else {
+            alert('Error on value ')
+            document.getElementById(id).focus()
+            return false
+          }
+        }
+        if (hasDuplicates(row)) {
+          alert('Error on row ')
+          return false
+        }
+      }
+      //Column by column checking
+      for (i = 1; i < 10; i++) {
+        var row = new Array()
+        for (j = 1; j < 10; j++) {
+          var id = 'inp_r' + j + '_c' + i
+          var cell = document.getElementById(id).value
+          if (cell < 10 && cell > 0) {
+            row.push(cell)
+          } else {
+            alert('Error on value')
+            document.getElementById(id).focus()
+            return false
+          }
+        }
+        if (hasDuplicates(row)) {
+          alert('Error on column')
+          return false
+        }
+      }
+      //Group by group checking
+      var group1 = new Array()
+      var group2 = new Array()
+      var group3 = new Array()
+      for (i = 1; i < 10; i++) {
+        for (j = 1; j < 10; j++) {
+          var id = 'inp_r' + j + '_c' + i
+          var cell = document.getElementById(id).value
+          if (cell < 10 && cell > 0) {
+            if (j < 4) {
+              group1.push(cell)
+            } else if (j < 7) {
+              group2.push(cell)
+            } else {
+              group3.push(cell)
+            }
+          } else {
+            alert('Error on value')
+            document.getElementById(id).focus()
+            return false
+          }
+        }
+        if (i % 3 == 0) {
+          if (hasDuplicates(group1)) {
+            alert('Error on grid')
+            return false
+          }
+          if (hasDuplicates(group2)) {
+            alert('Error on grid')
+            return false
+          }
+          if (hasDuplicates(group3)) {
+            alert('Error on grid')
+            return false
+          }
+          group1 = []
+          group2 = []
+          group3 = []
+        }
+      }
+      alert('Congratulations! You won the game!')
+      fillgrid()
+    }
+
+    //partially fill the cells
+    function fillgrid () {
+      var source = generation()
+      var range = document.getElementById('level').value
+      for (i = 0; i < 9; i++) {
+        for (j = 0; j < 9; j++) {
+          var r = (i + 1).toString()
+          var c = (j + 1).toString()
+          var id = 'inp_r' + r + '_c' + c
+          var checkcell = get_random()
+          var level = true
+          if (range == 1) {
+            level = checkcell % 3 != 0
+          } else if (range == 2) {
+            level = checkcell % 2 == 0
+          } else {
+            level = checkcell % 3 == 0
+          }
+          if (level) {
+            document.getElementById(id).value = source[i][j]
+            document.getElementById(id).disabled = true
+          } else {
+            document.getElementById(id).value = ''
+            document.getElementById(id).disabled = false
+
+          }
+        }
+
+      }
+      //showtimer();
+
+    }
+
+    //generate the random two dimensional array
+    function generation () {
+      var start = get_random()
+      var source = new Array()
+      for (i = 0; i < 9; i++) {
+        var row = new Array()
+        if (i % 3 == 0) {
+          start += 4
+        } else {
+          start += 3
+        }
+        if (start > 9) {
+          start = Math.floor(start / 10) + Math.floor(start % 10)
+        }
+        var cell = start
+        for (j = 0; j < 9; j++) {
+          row.push(cell)
+          cell = cell + 1
+          if (cell > 9) {
+            cell = Math.floor(cell / 10) + Math.floor(cell % 10)
+          }
+        }
+        source.push(row)
+      }
+      return source
+    }
+
+    function get_random () {
+      return Math.floor((Math.random() * 9) + 1)
+    }
+
+    function hasDuplicates (array) {
+      return (new Set(array)).size !== array.length
+    }
+
+    function showtimer () {
+      var hrs = 0
+      var min = 0
+      var sec = 0
+      var html = ''
+      var hs, ms, ss
+      setInterval(function () {
+        if (sec < 10) {
+          ss = '0' + sec.toString()
+        } else {
+          ss = sec.toString()
+        }
+        if (min < 10) {
+          ms = '0' + min.toString()
+        } else {
+          ms = min.toString()
+        }
+
+        if (hrs < 10) {
+          hs = '0' + hrs.toString()
+        } else {
+          hs = hrs.toString()
+        }
+        html = hs + ' : ' + ms + ' : ' + ss
+        document.getElementById('timer').innerHTML = html
+        if (sec = 59) {
+          sec = 0
+          if (min = 59) {
+            min = 0
+            hrs = hrs + 1
+          } else {
+            min = min + 1
+          }
+        } else {
+          sec = sec + 1
+        }
+
+      }, 1000)
+    }
+  </script>
+</head>
+<body onload='fillgrid();'>
+
+<div id='form_area'>
+  Difficulty level:
+  <select id='level'>
+    <option value='1'>Easy</option>
+    <option value='2'>Medium</option>
+    <option value='3'>Difficult</option>
+  </select>
+  <br>
+  <input type='button' value=' Recreat ' onclick='fillgrid();'>
+  <span id='timer'></span>
+  <input type='button' value=' Submit ' onclick='checkgrid();'>
+</div>
+<div id='sudoku_area'>
+  <h3> Sudoku </h3>
+  <table id='grid'>
+    <tr>
+      <td id='td_r1_c1' class='red'>
+        <input type='text' id='inp_r1_c1'>
+      </td>
+      <td id='td_r1_c2' class='red'>
+        <input type='text' id='inp_r1_c2'>
+      </td>
+      <td id='td_r1_c3' class='red'>
+        <input type='text' id='inp_r1_c3'>
+      </td>
+      <td id='td_r1_c4'>
+        <input type='text' id='inp_r1_c4'>
+      </td>
+      <td id='td_r1_c5'>
+        <input type='text' id='inp_r1_c5'>
+      </td>
+      <td id='td_r1_c6'>
+        <input type='text' id='inp_r1_c6'>
+      </td>
+      <td id='td_r1_c7' class='red'>
+        <input type='text' id='inp_r1_c7'>
+      </td>
+      <td id='td_r1_c8' class='red'>
+        <input type='text' id='inp_r1_c8'>
+      </td>
+      <td id='td_r1_c9' class='red'>
+        <input type='text' id='inp_r1_c9'>
+      </td>
+    </tr>
+    <tr>
+      <td id='td_r2_c1' class='red'>
+        <input type='text' id='inp_r2_c1'>
+      </td>
+      <td id='td_r2_c2' class='red'>
+        <input type='text' id='inp_r2_c2'>
+      </td>
+      <td id='td_r2_c3' class='red'>
+        <input type='text' id='inp_r2_c3'>
+      </td>
+      <td id='td_r2_c4'>
+        <input type='text' id='inp_r2_c4'>
+      </td>
+      <td id='td_r2_c5'>
+        <input type='text' id='inp_r2_c5'>
+      </td>
+      <td id='td_r2_c6'>
+        <input type='text' id='inp_r2_c6'>
+      </td>
+      <td id='td_r2_c7' class='red'>
+        <input type='text' id='inp_r2_c7'>
+      </td>
+      <td id='td_r2_c8' class='red'>
+        <input type='text' id='inp_r2_c8'>
+      </td>
+      <td id='td_r2_c9' class='red'>
+        <input type='text' id='inp_r2_c9'>
+      </td>
+    </tr>
+    <tr>
+      <td id='td_r3_c1' class='red'>
+        <input type='text' id='inp_r3_c1'>
+      </td>
+      <td id='td_r3_c2' class='red'>
+        <input type='text' id='inp_r3_c2'>
+      </td>
+      <td id='td_r3_c3' class='red'>
+        <input type='text' id='inp_r3_c3'>
+      </td>
+      <td id='td_r3_c4'>
+        <input type='text' id='inp_r3_c4'>
+      </td>
+      <td id='td_r3_c5'>
+        <input type='text' id='inp_r3_c5'>
+      </td>
+      <td id='td_r3_c6'>
+        <input type='text' id='inp_r3_c6'>
+      </td>
+      <td id='td_r3_c7' class='red'>
+        <input type='text' id='inp_r3_c7'>
+      </td>
+      <td id='td_r3_c8' class='red'>
+        <input type='text' id='inp_r3_c8'>
+      </td>
+      <td id='td_r3_c9' class='red'>
+        <input type='text' id='inp_r3_c9'>
+      </td>
+    </tr>
+    <tr>
+      <td id='td_r4_c1'>
+        <input type='text' id='inp_r4_c1'>
+      </td>
+      <td id='td_r4_c2'>
+        <input type='text' id='inp_r4_c2'>
+      </td>
+      <td id='td_r4_c3'>
+        <input type='text' id='inp_r4_c3'>
+      </td>
+      <td id='td_r4_c4' class='red'>
+        <input type='text' id='inp_r4_c4'>
+      </td>
+      <td id='td_r4_c5' class='red'>
+        <input type='text' id='inp_r4_c5'>
+      </td>
+      <td id='td_r4_c6' class='red'>
+        <input type='text' id='inp_r4_c6'>
+      </td>
+      <td id='td_r4_c7'>
+        <input type='text' id='inp_r4_c7'>
+      </td>
+      <td id='td_r4_c8'>
+        <input type='text' id='inp_r4_c8'>
+      </td>
+      <td id='td_r4_c9'>
+        <input type='text' id='inp_r4_c9'>
+      </td>
+    </tr>
+    <tr>
+      <td id='td_r5_c1'>
+        <input type='text' id='inp_r5_c1'>
+      </td>
+      <td id='td_r5_c2'>
+        <input type='text' id='inp_r5_c2'>
+      </td>
+      <td id='td_r5_c3'>
+        <input type='text' id='inp_r5_c3'>
+      </td>
+      <td id='td_r5_c4' class='red'>
+        <input type='text' id='inp_r5_c4'>
+      </td>
+      <td id='td_r5_c5' class='red'>
+        <input type='text' id='inp_r5_c5'>
+      </td>
+      <td id='td_r5_c6' class='red'>
+        <input type='text' id='inp_r5_c6'>
+      </td>
+      <td id='td_r5_c7'>
+        <input type='text' id='inp_r5_c7'>
+      </td>
+      <td id='td_r5_c8'>
+        <input type='text' id='inp_r5_c8'>
+      </td>
+      <td id='td_r5_c9'>
+        <input type='text' id='inp_r5_c9'>
+      </td>
+    </tr>
+    <tr>
+      <td id='td_r6_c1'>
+        <input type='text' id='inp_r6_c1'>
+      </td>
+      <td id='td_r6_c2'>
+        <input type='text' id='inp_r6_c2'>
+      </td>
+      <td id='td_r6_c3'>
+        <input type='text' id='inp_r6_c3'>
+      </td>
+      <td id='td_r6_c4' class='red'>
+        <input type='text' id='inp_r6_c4'>
+      </td>
+      <td id='td_r6_c5' class='red'>
+        <input type='text' id='inp_r6_c5'>
+      </td>
+      <td id='td_r6_c6' class='red'>
+        <input type='text' id='inp_r6_c6'>
+      </td>
+      <td id='td_r6_c7'>
+        <input type='text' id='inp_r6_c7'>
+      </td>
+      <td id='td_r6_c8'>
+        <input type='text' id='inp_r6_c8'>
+      </td>
+      <td id='td_r6_c9'>
+        <input type='text' id='inp_r6_c9'>
+      </td>
+    </tr>
+    <tr>
+      <td id='td_r7_c1' class='red'>
+        <input type='text' id='inp_r7_c1'>
+      </td>
+      <td id='td_r7_c2' class='red'>
+        <input type='text' id='inp_r7_c2'>
+      </td>
+      <td id='td_r7_c3' class='red'>
+        <input type='text' id='inp_r7_c3'>
+      </td>
+      <td id='td_r7_c4'>
+        <input type='text' id='inp_r7_c4'>
+      </td>
+      <td id='td_r7_c5'>
+        <input type='text' id='inp_r7_c5'>
+      </td>
+      <td id='td_r7_c6'>
+        <input type='text' id='inp_r7_c6'>
+      </td>
+      <td id='td_r7_c7' class='red'>
+        <input type='text' id='inp_r7_c7'>
+      </td>
+      <td id='td_r7_c8' class='red'>
+        <input type='text' id='inp_r7_c8'>
+      </td>
+      <td id='td_r7_c9' class='red'>
+        <input type='text' id='inp_r7_c9'>
+      </td>
+    </tr>
+    <tr>
+      <td id='td_r8_c1' class='red'>
+        <input type='text' id='inp_r8_c1'>
+      </td>
+      <td id='td_r8_c2' class='red'>
+        <input type='text' id='inp_r8_c2'>
+      </td>
+      <td id='td_r8_c3' class='red'>
+        <input type='text' id='inp_r8_c3'>
+      </td>
+      <td id='td_r8_c4'>
+        <input type='text' id='inp_r8_c4'>
+      </td>
+      <td id='td_r8_c5'>
+        <input type='text' id='inp_r8_c5'>
+      </td>
+      <td id='td_r8_c6'>
+        <input type='text' id='inp_r8_c6'>
+      </td>
+      <td id='td_r8_c7' class='red'>
+        <input type='text' id='inp_r8_c7'>
+      </td>
+      <td id='td_r8_c8' class='red'>
+        <input type='text' id='inp_r8_c8'>
+      </td>
+      <td id='td_r8_c9' class='red'>
+        <input type='text' id='inp_r8_c9'>
+      </td>
+    </tr>
+    <tr>
+      <td id='td_r9_c1' class='red'>
+        <input type='text' id='inp_r9_c1'>
+      </td>
+      <td id='td_r9_c2' class='red'>
+        <input type='text' id='inp_r9_c2'>
+      </td>
+      <td id='td_r9_c3' class='red'>
+        <input type='text' id='inp_r9_c3'>
+      </td>
+      <td id='td_r9_c4'>
+        <input type='text' id='inp_r9_c4'>
+      </td>
+      <td id='td_r9_c5'>
+        <input type='text' id='inp_r9_c5'>
+      </td>
+      <td id='td_r9_c6'>
+        <input type='text' id='inp_r9_c6'>
+      </td>
+      <td id='td_r9_c7' class='red'>
+        <input type='text' id='inp_r9_c7'>
+      </td>
+      <td id='td_r9_c8' class='red'>
+        <input type='text' id='inp_r9_c8'>
+      </td>
+      <td id='td_r9_c9' class='red'>
+        <input type='text' id='inp_r9_c9'>
+      </td>
+    </tr>
+  </table>
+</div>
+</body>
+</html>
