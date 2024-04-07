@@ -1,23 +1,20 @@
-import React from "react";
-import { Outlet, Link } from "react-router-dom";
+import React from 'react'
+import { Outlet, Link } from 'react-router-dom'
 
-function Navigate() {
+import { Typography } from '@mui/material'
+import classes from '*.module.css'
+
+
+function Navigate () {
   return (
-    <div>
-      <ul style={{ listStyle: "none" }}>
-        <li>
-          <Link to="/">Home</Link>
-        </li>
-        <li>
-          <Link to="/about">About-Us</Link>
-        </li>
-        <li>
-          <Link to="/contact">Contact-Us</Link>
-        </li>
-      </ul>
-
-      <Outlet />
-    </div>
-  );
+    <Typography className={classes.root}>
+      <Link to="/">
+        Home
+      </Link>
+      <Link to="/about">About-Us</Link>
+      <Link to="/contact">Contact-Us</Link>
+    </Typography>
+  )
 }
-export default Navigate;
+
+export default Navigate
