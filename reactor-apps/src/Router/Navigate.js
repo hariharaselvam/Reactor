@@ -1,23 +1,24 @@
-import React from "react";
-import { Outlet, Link } from "react-router-dom";
+import Container from 'react-bootstrap/Container';
+import Nav from 'react-bootstrap/Nav';
+import Navbar from 'react-bootstrap/Navbar';
 
 function Navigate() {
   return (
-    <div>
-      <ul style={{ listStyle: "none" }}>
-        <li>
-          <Link to="/">Home</Link>
-        </li>
-        <li>
-          <Link to="/about">About-Us</Link>
-        </li>
-        <li>
-          <Link to="/contact">Contact-Us</Link>
-        </li>
-      </ul>
+    <>
+      <Navbar bg="primary" data-bs-theme="dark">
+        <Container>
+          <Navbar.Brand>Hari</Navbar.Brand>
+          <Nav className="me-auto">
+            <Nav.Link href="/">Home</Nav.Link>
+            <Nav.Link href="/flames">Flames</Nav.Link>
+            <Nav.Link href="/about">About</Nav.Link>
+            <Nav.Link href="/contact">Contact</Nav.Link>
+          </Nav>
+        </Container>
+      </Navbar>
 
-      <Outlet />
-    </div>
+    </>
   );
 }
+
 export default Navigate;
